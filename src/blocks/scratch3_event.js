@@ -1,4 +1,5 @@
 const Cast = require('../util/cast');
+const UrlHelper = require('../util/url.js');
 
 class Scratch3EventBlocks {
     constructor (runtime) {
@@ -15,6 +16,17 @@ class Scratch3EventBlocks {
             this.runtime.startHats('event_whenkeypressed', {
                 KEY_OPTION: 'any'
             });
+        });
+
+        this.runtime.on('event_whenbroadcastreceived_shouldregisterjsbridge', broadcastVar => {
+            if (broadcastVar.name) {
+                const broadcastOption = `app://${broadcastVar.name}`;
+                // eslint-disable-next-line no-console
+                console.log('[event_whenbroadcastreceived_shouldregisterjsbridge]', broadcastOption);
+                this.runtime.startHats('event_whenbroadcastreceived', {
+                    BROADCAST_OPTION: broadcastOption
+                });
+            }
         });
     }
 
@@ -86,6 +98,12 @@ class Scratch3EventBlocks {
             util.startHats('event_whenbroadcastreceived', {
                 BROADCAST_OPTION: broadcastOption
             });
+
+            if (UrlHelper.analyze(broadcastOption)) {
+                // eslint-disable-next-line no-console
+                console.log('[event_whenbroadcastreceived_shouldcalljsbridge]', UrlHelper.analyze(broadcastOption));
+                util.runtime.emit('event_whenbroadcastreceived_shouldcalljsbridge', UrlHelper.analyze(broadcastOption));
+            }
         }
     }
 
